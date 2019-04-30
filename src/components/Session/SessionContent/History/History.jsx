@@ -14,7 +14,6 @@ export default class History extends React.Component {
             trustline: true,
         };
 
-        this.props.d.history.handlers.touch();
         this.listenId = this.props.d.history.event.listen(() => {
             this.forceUpdate();
         });

@@ -131,6 +131,7 @@ export default function Send(driver) {
                 }
 
                 this.account.addUnknownAssetData();
+                driver.history.handlers.loadHistory();
                 this.event.trigger();
             } catch (e) {
                 if (e.data) {

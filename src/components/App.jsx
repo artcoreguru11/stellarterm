@@ -18,6 +18,7 @@ import Header from './Header/Header';
 import Footer from './Footer/Footer';
 import Driver from '../lib/Driver';
 import Stellarify from '../lib/Stellarify';
+import PopupAlert from './PopupAlert';
 
 window.React = React;
 const mountNode = document.getElementById('app');
@@ -152,6 +153,7 @@ class TermApp extends React.Component {
                     <div>
                         <Header d={this.props.d} rootAddress={urlParts[0]} network={network} />
                         {body}
+                        <PopupAlert d={this.props.d}/>
                     </div>
                     <Footer />
                 </div>

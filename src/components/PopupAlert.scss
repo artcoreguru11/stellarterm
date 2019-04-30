@@ -1,0 +1,20 @@
+.PopupAlert {
+    position: fixed;
+    bottom: 50px;
+    right: -200px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+    background-color: #ffffff;
+    width: auto;
+    max-width: 200px;
+    padding: 1em;
+    transition: 0.5s ease-in-out;
+
+    .text{
+        color: #505558;
+        font-size: 16px;
+    }
+}
+
+.popup-show{
+    right: 200px;
+}

@@ -2,10 +2,10 @@ import Event from '../Event';
 
 export default function History(driver) {
     this.event = new Event();
-    this.history = { records: [], details: {}, loadedRecords: null };
+    this.history = { records: [], details: {}, moreRecords: null };
     this.loadMore = false;
     this.isLoading = false;
-    this.loadLimit = 20;
+    this.loadLimit = 10;
 
     this.handlers = {
         loadHistory: (loadMore) => {
@@ -17,20 +17,16 @@ export default function History(driver) {
             }
         },
         loadRecordsWithLimit: async (Server, publicKey) => {
-            if (this.history.loadedRecords === null) {
+            if (this.history.moreRecords === null) {
                 // First init loading
-                this.history.loadedRecords = await Server.effects()
-                    .forAccount(publicKey)
-                    .limit(this.loadLimit)
-                    .order('desc')
-                    .call();
+                this.history.moreRecords = await this.handlers.getOperations(this.loadLimit);
             } else if (this.loadMore && !this.isLoading) {
-                this.history.loadedRecords = await this.history.loadedRecords.next();
+                this.history.moreRecords = await this.history.moreRecords.next();
             }
 
-            if (this.history.loadedRecords.records.length !== 0 && !this.isLoading) {
+            if (this.history.moreRecords.records.length !== 0 && !this.isLoading) {
                 this.isLoading = true;
-                this.history.records = this.history.records.concat(this.history.loadedRecords.records);
+                this.history.records = this.history.records.concat(this.history.moreRecords.records);
                 this.handlers.loadRecordsWithLimit(Server, publicKey);
                 this.event.trigger();
                 this.handlers.getOperationDetails();
@@ -42,8 +38,6 @@ export default function History(driver) {
                 const record = this.history.records[i];
                 if (fetchTarget === null && this.history.details[record.id] === undefined) {
                     fetchTarget = i;
-                } else {
-                    this.isLoading = false;
                 }
             }
 
@@ -64,25 +58,28 @@ export default function History(driver) {
             this.event.trigger();
         },
         listenNewTransactions: async (Server, publicKey) => {
-            const newOperationCallback = async (res) => {
-                const lastOperation = await Server.effects()
-                    .forAccount(publicKey)
-                    .limit(1)
-                    .order('desc')
-                    .call();
-
-                if (lastOperation.records.length !== 0) {
-                    this.history.records = lastOperation.records.concat(this.history.records);
-                    this.handlers.getOperationDetails();
-                }
-            };
-
             Server.operations()
                 .forAccount(publicKey)
                 .cursor('now')
                 .stream({
-                    onmessage: newOperationCallback,
+                    onmessage: this.handlers.newOperationCallback,
                 });
+        },
+        newOperationCallback: async () => {
+            const lastOperation = await this.handlers.getOperations(1);
+
+            if (lastOperation.records.length !== 0) {
+                this.history.records = lastOperation.records.concat(this.history.records);
+                this.handlers.getOperationDetails();
+            }
+        },
+        getOperations: async (opLimit) => {
+            const opsResult = await driver.Server.effects()
+                .forAccount(driver.session.account.account_id)
+                .limit(opLimit)
+                .order('desc')
+                .call();
+            return opsResult;
         },
     };
 }

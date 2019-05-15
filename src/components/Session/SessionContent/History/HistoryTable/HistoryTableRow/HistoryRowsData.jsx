@@ -239,6 +239,11 @@ const HISTORY_DATA_GENERATORS = {
                     ? directory.resolveAssetByAccountId(data.bought_asset_code, data.bought_asset_issuer).domain
                     : 'native',
             },
+            {
+                header: 'PRICE: ',
+                value: Printify.lightenZeros((data.sold_amount / data.bought_amount).toFixed(7).toString()),
+                isAsset: false,
+            },
         ],
     }),
 

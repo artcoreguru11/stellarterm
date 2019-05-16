@@ -5,22 +5,21 @@ export default function History(driver) {
     this.history = { records: [], details: {}, moreRecords: null };
     this.loadMore = false;
     this.isLoading = false;
+    this.allLoaded = false;
     this.loadLimit = 10;
 
     this.handlers = {
-        loadHistory: (loadMore) => {
+        loadHistory: async (loadMore) => {
             this.loadMore = loadMore;
-            if (this.loadMore === true && this.isLoading === false) {
-                setTimeout(async () => {
-                    await this.handlers.loadRecordsWithLimit(driver.Server, driver.session.account.account_id);
-                }, 10);
+            if (this.loadMore && !this.isLoading && !this.allLoaded) {
+                await this.handlers.loadRecordsWithLimit(driver.Server, driver.session.account.account_id);
             }
         },
         loadRecordsWithLimit: async (Server, publicKey) => {
             if (this.history.moreRecords === null) {
                 // First init loading
                 this.history.moreRecords = await this.handlers.getOperations(this.loadLimit);
-            } else if (this.loadMore && !this.isLoading) {
+            } else if (this.loadMore && !this.isLoading && !this.allLoaded) {
                 this.history.moreRecords = await this.history.moreRecords.next();
             }
 
@@ -28,8 +27,10 @@ export default function History(driver) {
                 this.isLoading = true;
                 this.history.records = this.history.records.concat(this.history.moreRecords.records);
                 this.handlers.loadRecordsWithLimit(Server, publicKey);
-                this.event.trigger();
                 this.handlers.getOperationDetails();
+            } else if (this.history.moreRecords.records.length === 0) {
+                this.allLoaded = true;
+                this.event.trigger();
             }
         },
         getOperationDetails: async () => {

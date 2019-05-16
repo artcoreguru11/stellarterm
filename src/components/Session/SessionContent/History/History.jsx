@@ -78,22 +78,28 @@ export default class History extends React.Component {
     }
 
     createFilterButton(filterState, filterName) {
+        const isLastFilter = Object.values(this.state).filter(el => el === true).length === 1;
         const filterIsActive = filterState ? ' is-active' : '';
 
         return (
             <button
                 className={`s-button s-button--light text__capitalize${filterIsActive}`}
                 onClick={() => {
-                    this.updateFilter(`${filterName}`);
+                    this.updateFilter(`${filterName}`, isLastFilter);
                 }}>
                 {filterName}
             </button>
         );
     }
 
-    updateFilter(name) {
-        this.loadMoreHistoryCheck();
-        this.setState({ [name]: !this.state[name] });
+    updateFilter(name, isLastFilter) {
+        if (
+            (!isLastFilter && this.state[name] === true) ||
+            (isLastFilter && this.state[name] === false) ||
+            !isLastFilter
+        ) {
+            this.setState({ [name]: !this.state[name] });
+        }
     }
 
     render() {

@@ -70,9 +70,8 @@ export default class HistoryTable extends React.Component {
             );
         }
 
-        const historyRows = this.getHistoryRows(history);
+        const historyRows = this.getHistoryRows();
         const loadedRecords = historyRows.length;
-        const totalRecords = history.records.length;
 
         return (
             <table className="HistoryTable">
@@ -87,12 +86,7 @@ export default class HistoryTable extends React.Component {
                     {historyRows}
 
                     <tr className="HistoryTable__row HistoryTable__row__loading" key={'loading'} id="scroll_row_bottom">
-                        <td>
-                            {this.props.d.history.isLoading
-                            ? <span>Loading<Ellipsis /></span>
-                            : 'Loaded'
-                            } [{loadedRecords}/{totalRecords}]
-                        </td>
+                        <td>{this.props.d.history.allLoaded ? 'No more history!' : `Loaded: ${loadedRecords}`}</td>
                     </tr>
                 </tbody>
             </table>

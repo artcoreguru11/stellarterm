@@ -10,18 +10,18 @@ export default class extends React.Component {
         };
     }
 
-    componentWillMount() {
-        this.timeout = setTimeout(() => this.tick(), 1000);
-    }
+    // componentWillMount() {
+    //     this.timeout = setTimeout(() => this.tick(), 1000);
+    // }
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
     }
 
-    tick() {
-        this.setState({ visible: !this.state.visible });
-        this.timeout = setTimeout(() => this.tick(), 1000);
-    }
+    // tick() {
+    //     this.setState({ visible: !this.state.visible });
+    //     this.timeout = setTimeout(() => this.tick(), 1000);
+    // }
 
     render() {
         const { lastOperation } = this.props.d.history;
@@ -39,19 +39,27 @@ export default class extends React.Component {
                 break;
             }
         }
-        const popup = operationExists ? (
-            <div className={`PopupAlert ${operationExists ? 'popup-show' : ''}`}>
-                <div className="text">You recieved {operationInfo.amount}</div>
-                <div className="text">
+        // const popup = operationExists ? (
+        //     <div className={`PopupAlert ${operationExists ? 'popup-show' : ''}`}>
+        //         <div className="text">You recieved {operationInfo.amount}</div>
+        //         <div className="text">
+        //             <AssetCard2 code={operationInfo.code} issuer={operationInfo.issuer} />
+        //         </div>
+        //     </div>
+        // ) : (
+        //     <div className="PopupAlert">
+        //         <div className="text">Stateless</div>
+        //     </div>
+        // );
+
+        return (
+            <div className={'PopupAlert popup-show'}>
+                <div className="popup-title">Offer closed</div>
+                <div className="popup-text">You BTC to XLM offer was closed</div>
+                {/* <div className="text">
                     <AssetCard2 code={operationInfo.code} issuer={operationInfo.issuer} />
-                </div>
-            </div>
-        ) : (
-            <div className="PopupAlert">
-                <div className="text">Stateless</div>
+                </div> */}
             </div>
         );
-
-        return popup;
     }
 }
